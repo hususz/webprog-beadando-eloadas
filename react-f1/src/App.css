@@ -1,0 +1,12 @@
+.App { text-align: center; background-color: #f4f4f4; min-height: 100vh; }
+.f1-header { background-color: #e10600; color: white; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+.container { padding: 20px; }
+.form-box { margin-bottom: 20px; }
+input { padding: 10px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+button { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; }
+.add-btn { background-color: #e10600; }
+.edit-btn { background-color: #ff9800; margin-right: 5px; }
+.del-btn { background-color: #f44336; }
+table { width: 80%; margin: 0 auto; border-collapse: collapse; background: white; }
+th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+th { background-color: #333; color: white; }
