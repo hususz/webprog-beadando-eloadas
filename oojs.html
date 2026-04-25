@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OOJS - F1 Verseny</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { overflow-x: hidden; } /* Ne legyen vízszintes görgetősáv a verseny miatt */
+        .info-box { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 800px; margin: 20px auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; position: relative; z-index: 10; }
+        .btn-start { background-color: #e10600; color: white; padding: 10px 20px; font-size: 1.2rem; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-start:hover { background-color: #b30000; }
+        .celvonal { position: absolute; right: 50px; top: 0; bottom: 0; width: 10px; background: repeating-linear-gradient(45deg, #000, #000 10px, #fff 10px, #fff 20px); z-index: 1; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Web programozás-1 Előadás Házi feladat</h1>
+        <p>Objektumorientált JavaScript (OOJS) Grafikus Alkalmazás</p>
+    </header>
+
+    <div class="info-box">
+        <h2>F1 Gyorsulási Verseny</h2>
+        <p>Kattints a start gombra a futam elindításához!</p>
+        <button class="btn-start" onclick="startVerseny()" id="startGomb">🚦 START 🚦</button>
+        <br><br>
+        <a href="index.html" style="text-decoration: none; color: #e10600; font-weight: bold;">← Vissza a főoldalra</a>
+    </div>
+
+    <div class="celvonal"></div>
+
+    <script>
+        class Jarmu {
+
+            constructor(nev, szin, yPoz) {
+                this.nev = nev;
+                this.szin = szin;
+                this.yPoz = yPoz;
+                this.xPoz = 20; 
+                
+                this.elem = document.createElement('div');
+            }
+
+            megjelenit() {
+                this.elem.style.position = 'absolute';
+                this.elem.style.left = this.xPoz + 'px';
+                this.elem.style.top = this.yPoz + 'px';
+                this.elem.style.width = '120px';
+                this.elem.style.height = '40px';
+                this.elem.style.backgroundColor = this.szin;
+                this.elem.style.color = 'white';
+                this.elem.style.fontWeight = 'bold';
+                this.elem.style.textAlign = 'center';
+                this.elem.style.lineHeight = '40px';
+                this.elem.style.borderRadius = '0 20px 20px 0'; // F1 autó orra
+                this.elem.style.boxShadow = '2px 2px 5px rgba(0,0,0,0.5)';
+                this.elem.innerHTML = this.nev;
+                this.elem.style.zIndex = '5';
+
+                document.body.appendChild(this.elem);
+            }
+        }
+
+
+        class F1Auto extends Jarmu {
+            constructor(nev, szin, yPoz, sebessegSzorzo) {
+
+                super(nev, szin, yPoz);
+                this.sebessegSzorzo = sebessegSzorzo;
+                this.vege = false;
+            }
+
+
+            mozog() {
+                if (this.vege) return false;
+
+
+                let leptek = Math.random() * 15 * this.sebessegSzorzo;
+                this.xPoz += leptek;
+                this.elem.style.left = this.xPoz + 'px';
+
+
+                if (this.xPoz >= window.innerWidth - 180) {
+                    this.vege = true;
+                    this.elem.innerHTML = "🏁 CÉL!";
+                    return true; 
+                }
+                return false;
+            }
+        }
+
+
+        let autok = [];
+        let versenyFut = false;
+        let animacioId;
+
+        function initVerseny() {
+
+            autok.forEach(auto => {
+                if(auto.elem.parentNode) {
+                    auto.elem.parentNode.removeChild(auto.elem);
+                }
+            });
+
+            // Objektumok példányosítása (A képernyő aljára tesszük őket)
+            let ablakMagassag = window.innerHeight;
+            autok = [
+                new F1Auto("Mercedes", "#00d2be", ablakMagassag - 200, 1.1),
+                new F1Auto("Ferrari", "#dc0000", ablakMagassag - 140, 1.2),
+                new F1Auto("Red Bull", "#0600ef", ablakMagassag - 80, 1.15)
+            ];
+
+
+            autok.forEach(auto => auto.megjelenit());
+        }
+
+        function startVerseny() {
+            if (versenyFut) return;
+            
+            document.getElementById('startGomb').disabled = true;
+            initVerseny();
+            versenyFut = true;
+            
+            // Animációs ciklus
+            function jatekCiklus() {
+                let nyertesVan = false;
+
+                autok.forEach(auto => {
+                    if (auto.mozog()) {
+                        nyertesVan = true;
+                        alert("A nyertes: " + auto.nev + "!");
+                    }
+                });
+
+                if (!nyertesVan) {
+                    animacioId = requestAnimationFrame(jatekCiklus);
+                } else {
+                    versenyFut = false;
+                    document.getElementById('startGomb').disabled = false;
+                    document.getElementById('startGomb').innerText = "🔄 Újraindítás";
+                }
+            }
+
+
+            jatekCiklus();
+        }
+
+
+        window.onload = initVerseny;
+    </script>
+</body>
+</html>
