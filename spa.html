@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPA Menü - React Alkalmazások</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        .spa-container { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 800px; margin: 20px auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .spa-nav { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; }
+        .spa-nav button { padding: 10px 20px; cursor: pointer; border: none; border-radius: 4px; background: #333; color: white; font-weight: bold; transition: 0.3s; }
+        .spa-nav button.active { background: #e10600; }
+        .spa-nav button:hover { background: #e10600; }
+        .app-box { border: 1px solid #ddd; padding: 30px; border-radius: 8px; text-align: center; background: #fafafa; }
+        .btn-action { padding: 8px 15px; margin: 5px; cursor: pointer; border: none; border-radius: 4px; background: #333; color: white; font-weight: bold; }
+        .todo-input { padding: 8px; width: 200px; border: 1px solid #ccc; border-radius: 4px; }
+        .todo-add { padding: 8px 15px; background: #e10600; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Web programozás-1 Előadás Házi feladat</h1>
+        <p>Single Page Application (SPA) 2 menüvel</p>
+    </header>
+
+    <div id="root"></div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="index.html" style="text-decoration: none; color: #e10600; font-weight: bold;">← Vissza a főoldalra</a>
+    </div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const CounterApp = () => {
+            const [szam, setSzam] = useState(0); // useState használata
+
+            return (
+                <div className="app-box">
+                    <h2>Körszámláló (Számológép)</h2>
+                    <h3 style={{fontSize: '40px', color: '#e10600', margin: '10px 0'}}>{szam}</h3>
+                    <button className="btn-action" onClick={() => setSzam(szam + 1)}>+1 Kör</button>
+                    <button className="btn-action" onClick={() => setSzam(szam - 1)}>-1 Kör</button>
+                    <button className="btn-action" onClick={() => setSzam(0)}>Nullázás</button>
+                    <p style={{marginTop: '20px', fontSize: '12px', color: '#666'}}>
+                        Forrás megjelölése a dokumentációhoz: Saját fejlesztés, alap React useState számláló példa alapján.
+                    </p>
+                </div>
+            );
+        };
+
+        const TodoApp = () => {
+            const [teendok, setTeendok] = useState(["Forma-1 futam megnézése", "Beadandó feltöltése"]); // useState használata
+            const [ujTeendo, setUjTeendo] = useState("");
+
+            const hozzaadas = () => {
+                if(ujTeendo.trim() !== "") {
+                    setTeendok([...teendok, ujTeendo]);
+                    setUjTeendo("");
+                }
+            };
+
+            return (
+                <div className="app-box">
+                    <h2>Boxutca Teendők (To-Do List)</h2>
+                    <div>
+                        <input 
+                            type="text" 
+                            className="todo-input" 
+                            value={ujTeendo} 
+                            onChange={(e) => setUjTeendo(e.target.value)} 
+                            placeholder="Új feladat..."
+                        />
+                        <button className="todo-add" onClick={hozzaadas}>Felvétel</button>
+                    </div>
+                    <ul style={{textAlign: 'left', display: 'inline-block', marginTop: '20px', minWidth: '200px'}}>
+                        {teendok.map((t, index) => (
+                            <li key={index} style={{marginBottom: '10px'}}>{t}</li>
+                        ))}
+                    </ul>
+                    <p style={{marginTop: '20px', fontSize: '12px', color: '#666'}}>
+                        Forrás megjelölése a dokumentációhoz: Saját fejlesztés, alap React listakezelő példa alapján.
+                    </p>
+                </div>
+            );
+        };
+
+        // Fő SPA Komponens
+        const SpaApp = () => {
+            const [aktivMenu, setAktivMenu] = useState('counter');
+
+            return (
+                <div className="spa-container">
+                    <div className="spa-nav">
+                        <button 
+                            className={aktivMenu === 'counter' ? 'active' : ''} 
+                            onClick={() => setAktivMenu('counter')}
+                        >
+                            Számláló Alkalmazás
+                        </button>
+                        <button 
+                            className={aktivMenu === 'todo' ? 'active' : ''} 
+                            onClick={() => setAktivMenu('todo')}
+                        >
+                            Teendőlista Alkalmazás
+                        </button>
+                    </div>
+
+                    {/* Tartalom cseréje a kiválasztott menü alapján */}
+                    {aktivMenu === 'counter' && <CounterApp />}
+                    {aktivMenu === 'todo' && <TodoApp />}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SpaApp />);
+    </script>
+</body>
+</html>
