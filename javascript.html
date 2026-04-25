@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript CRUD - Pilóták</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .crud-container { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 800px; margin: 20px auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #e10600; color: white; }
+        .form-group { margin-bottom: 20px; display: flex; gap: 10px; }
+        input { padding: 8px; flex: 1; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 15px; cursor: pointer; color: white; border: none; border-radius: 4px; font-weight: bold; }
+        .btn-add { background: #e10600; }
+        .btn-edit { background: #ff9800; margin-right: 5px; }
+        .btn-delete { background: #f44336; }
+        .back-link { display: block; text-align: center; margin-top: 20px; text-decoration: none; color: #e10600; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Web programozás-1 Előadás Házi feladat</h1>
+        <p>JavaScript CRUD - Pilóták kezelése</p>
+    </header>
+
+    <div class="crud-container">
+        <h2>Új pilóta felvétele</h2>
+        <div class="form-group">
+            <input type="text" id="p_nev" placeholder="Pilóta neve (pl. Fernando Alonso)">
+            <input type="text" id="p_nemzet" placeholder="Nemzetiség (pl. spanyol)">
+            <button class="btn-add" onclick="addPilota()">Hozzáadás</button>
+        </div>
+
+        <table id="pilotaTable">
+            <thead>
+                <tr>
+                    <th>Név</th>
+                    <th>Nemzetiség</th>
+                    <th>Műveletek</th>
+                </tr>
+            </thead>
+            <tbody id="pilotaBody">
+                </tbody>
+        </table>
+    </div>
+
+    <a href="index.html" class="back-link">← Vissza a főoldalra</a>
+
+    <script>
+        // 1. Kezdő adatok a memóriában (tömbben)
+        let pilotak = [
+            { id: 1, nev: "Lewis Hamilton", nemzetseg: "brit" },
+            { id: 2, nev: "Sebastian Vettel", nemzetseg: "német" },
+            { id: 3, nev: "Michael Schumacher", nemzetseg: "német" }
+        ];
+
+        // 2. Olvasás (Read) - Táblázat kirajzolása
+        function renderTable() {
+            const body = document.getElementById('pilotaBody');
+            body.innerHTML = '';
+            pilotak.forEach((p, index) => {
+                body.innerHTML += `
+                    <tr>
+                        <td>${p.nev}</td>
+                        <td>${p.nemzetseg}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editPilota(${index})">Szerkesztés</button>
+                            <button class="btn-delete" onclick="deletePilota(${index})">Törlés</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        // 3. Létrehozás (Create)
+        function addPilota() {
+            const nev = document.getElementById('p_nev').value;
+            const nemzet = document.getElementById('p_nemzet').value;
+            if(nev && nemzet) {
+                pilotak.push({ id: Date.now(), nev: nev, nemzetseg: nemzet });
+                renderTable();
+                document.getElementById('p_nev').value = '';
+                document.getElementById('p_nemzet').value = '';
+            } else {
+                alert("Kérlek töltsd ki mindkét mezőt!");
+            }
+        }
+
+        // 4. Törlés (Delete)
+        function deletePilota(index) {
+            if(confirm("Biztosan törölni szeretnéd ezt a pilótát?")) {
+                pilotak.splice(index, 1);
+                renderTable();
+            }
+        }
+
+        // 5. Frissítés (Update)
+        function editPilota(index) {
+            const ujNev = prompt("Add meg az új nevet:", pilotak[index].nev);
+            if(ujNev) {
+                pilotak[index].nev = ujNev;
+                renderTable();
+            }
+        }
+
+        // Első betöltéskor táblázat rajzolása
+        renderTable();
+    </script>
+</body>
+</html>
