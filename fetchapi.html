@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Fetch API CRUD - Adatbázissal</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .crud-container { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 800px; margin: 20px auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #e10600; color: white; }
+        .form-group { margin-bottom: 20px; display: flex; gap: 10px; }
+        input { padding: 8px; flex: 1; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 15px; cursor: pointer; color: white; border: none; border-radius: 4px; font-weight: bold; }
+        .btn-add { background: #e10600; }
+        .btn-edit { background: #ff9800; margin-right: 5px; }
+        .btn-delete { background: #f44336; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Web programozás-1 Előadás Házi feladat</h1>
+        <p>Fetch API CRUD - MySQL Adatbázisból (Szerver oldal)</p>
+    </header>
+
+    <div class="crud-container">
+        <h2>Új pilóta felvétele az adatbázisba</h2>
+        <div class="form-group">
+            <input type="text" id="p_nev" placeholder="Név">
+            <input type="text" id="p_nemzet" placeholder="Nemzetiség">
+            <button class="btn-add" onclick="addPilota()">Hozzáadás</button>
+        </div>
+
+        <table>
+            <thead><tr><th>Név</th><th>Nemzetiség</th><th>Műveletek</th></tr></thead>
+            <tbody id="pilotaBody"></tbody>
+        </table>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="index.html" style="text-decoration: none; color: #e10600; font-weight: bold;">← Vissza a főoldalra</a>
+    </div>
+
+    <script>
+        const API_URL = 'api.php';
+
+        // 1. Olvasás (GET)
+        async function fetchPilotak() {
+            const res = await fetch(API_URL);
+            const data = await res.json();
+            const body = document.getElementById('pilotaBody');
+            body.innerHTML = '';
+            data.forEach(p => {
+                body.innerHTML += `
+                    <tr>
+                        <td>${p.nev}</td>
+                        <td>${p.nemzetseg}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editPilota(${p.id}, '${p.nev}')">Szerkesztés</button>
+                            <button class="btn-delete" onclick="deletePilota(${p.id})">Törlés</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        // 2. Hozzáadás (POST)
+        async function addPilota() {
+            const nev = document.getElementById('p_nev').value;
+            const nemzet = document.getElementById('p_nemzet').value;
+            if(nev && nemzet) {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nev, nemzetseg: nemzet })
+                });
+                document.getElementById('p_nev').value = '';
+                document.getElementById('p_nemzet').value = '';
+                fetchPilotak();
+            }
+        }
+
+        // 3. Törlés (DELETE)
+        async function deletePilota(id) {
+            if(confirm("Törlöd az adatbázisból?")) {
+                await fetch(API_URL, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+                fetchPilotak();
+            }
+        }
+
+        // 4. Módosítás (PUT)
+        async function editPilota(id, regiNev) {
+            const ujNev = prompt("Új név:", regiNev);
+            if(ujNev && ujNev !== regiNev) {
+                await fetch(API_URL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, nev: ujNev })
+                });
+                fetchPilotak();
+            }
+        }
+
+        // Indításkor adatok betöltése
+        fetchPilotak();
+    </script>
+</body>
+</html>
